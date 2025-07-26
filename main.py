@@ -177,38 +177,38 @@ def polls():
     polls_data = load_polls()
     user_votes = load_user_votes()
     user_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
-    
+
     # Prepare polls with voting status and results
     polls_with_status = []
     for i, poll in enumerate(polls_data):
         poll_copy = poll.copy()
-        
+
         # Check if user has voted
         user_voted = user_ip in poll.get('votes', {})
         poll_copy['user_voted'] = user_voted
-        
+
         # Calculate results
         votes = poll.get('votes', {})
         results = {}
         total_votes = 0
-        
+
         for option in poll['options']:
             results[option] = 0
-        
+
         for voter_ip, vote in votes.items():
             if vote in results:
                 results[vote] += 1
                 total_votes += 1
-        
+
         poll_copy['results'] = results
         poll_copy['total_votes'] = total_votes
-        
+
         # Add comments if they exist
         if 'comments' not in poll_copy:
             poll_copy['comments'] = []
-        
+
         polls_with_status.append(poll_copy)
-    
+
     return render_template("polls.html", polls=polls_with_status)
 
 @app.route("/polls/vote/<int:poll_index>", methods=["POST"])
@@ -216,50 +216,50 @@ def vote_poll(poll_index):
     polls_data = load_polls()
     user_votes = load_user_votes()
     user_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
-    
+
     if 0 <= poll_index < len(polls_data):
         vote = request.form.get("vote")
-        
+
         # Check if user already voted
         if 'votes' not in polls_data[poll_index]:
             polls_data[poll_index]['votes'] = {}
-        
+
         if user_ip not in polls_data[poll_index]['votes']:
             # Record the vote
             polls_data[poll_index]['votes'][user_ip] = vote
             save_polls(polls_data)
-            
+
             flash("Your vote has been recorded!", "success")
         else:
             flash("You have already voted on this poll.", "error")
-    
+
     return redirect(url_for("polls"))
 
 @app.route("/admin/polls")
 def admin_polls():
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     polls_data = load_polls()
-    
+
     # Calculate total votes for each poll
     for poll in polls_data:
         poll['total_votes'] = len(poll.get('votes', {}))
-    
+
     return render_template("admin_polls.html", polls=polls_data)
 
 @app.route("/admin/polls/create", methods=["POST"])
 def create_poll():
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     question = request.form.get("question")
     options = request.form.getlist("options")
     admin_insight = request.form.get("admin_insight")
-    
+
     # Filter out empty options
     options = [opt.strip() for opt in options if opt.strip()]
-    
+
     if question and len(options) >= 2:
         new_poll = {
             "question": question,
@@ -268,55 +268,55 @@ def create_poll():
             "votes": {},
             "created_at": datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")
         }
-        
+
         polls_data = load_polls()
         polls_data.append(new_poll)
         save_polls(polls_data)
-        
+
         flash("Poll created successfully!", "success")
     else:
         flash("Please provide a question and at least 2 options.", "error")
-    
+
     return redirect(url_for("admin_polls"))
 
 @app.route("/admin/polls/delete/<int:poll_index>")
 def delete_poll(poll_index):
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     polls_data = load_polls()
-    
+
     if 0 <= poll_index < len(polls_data):
         polls_data.pop(poll_index)
         save_polls(polls_data)
         flash("Poll deleted successfully!", "success")
-    
+
     return redirect(url_for("admin_polls"))
 
 @app.route("/polls/comment/<int:poll_index>", methods=["POST"])
 def comment_on_poll(poll_index):
     data = request.get_json()
     comment_text = data.get("text", "").strip()
-    
+
     if not comment_text:
         return {"success": False}
-    
+
     polls_data = load_polls()
-    
+
     if 0 <= poll_index < len(polls_data):
         if 'comments' not in polls_data[poll_index]:
             polls_data[poll_index]['comments'] = []
-        
+
         new_comment = {
             "text": comment_text,
             "timestamp": datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")
         }
-        
+
         polls_data[poll_index]['comments'].append(new_comment)
         save_polls(polls_data)
-        
+
         return {"success": True}
-    
+
     return {"success": False}
 
 # Public Wall routes
@@ -324,43 +324,43 @@ def comment_on_poll(poll_index):
 def public_wall():
     user_posts = load_wall_posts()
     admin_posts = load_public_posts()
-    
+
     # Combine and sort posts by timestamp
     all_posts = []
-    
+
     # Add user messages with type indicator
     for post in user_posts:
         post_copy = post.copy()
         post_copy['type'] = 'user'
         if 'reactions' not in post_copy:
-            post_copy['reactions'] = {'like': 0, 'laugh': 0, 'heart': 0}
+            post_copy['reactions'] = {'like': 0, 'heart': 0, 'laugh': 0, 'sad': 0, 'wow': 0, 'angry': 0}
         if 'comments' not in post_copy:
             post_copy['comments'] = []
         all_posts.append(post_copy)
-    
+
     # Add admin posts with type indicator
     for post in admin_posts:
         post_copy = post.copy()
         post_copy['type'] = 'admin'
         if 'reactions' not in post_copy:
-            post_copy['reactions'] = {'like': 0, 'laugh': 0, 'heart': 0}
+            post_copy['reactions'] = {'like': 0, 'heart': 0, 'laugh': 0, 'sad': 0, 'wow': 0, 'angry': 0}
         if 'comments' not in post_copy:
             post_copy['comments'] = []
         all_posts.append(post_copy)
-    
+
     # Sort by timestamp (newest first)
     try:
         all_posts.sort(key=lambda x: datetime.strptime(x['timestamp'], "%Y-%m-%d %I:%M %p"), reverse=True)
     except:
         pass  # If timestamp parsing fails, keep original order
-    
+
     return render_template("public_wall.html", all_posts=all_posts)
 
 @app.route("/admin/wall")
 def admin_wall():
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     posts = load_wall_posts()
     return render_template("admin_wall.html", posts=posts)
 
@@ -368,36 +368,36 @@ def admin_wall():
 def post_to_wall(index):
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     messages = load_messages()
     wall_posts = load_wall_posts()
-    
+
     if 0 <= index < len(messages):
         message = messages[index].copy()
         # Mark as posted
         messages[index]['status'] = 'seen'
         save_messages(messages)
-        
+
         # Add to wall posts
         wall_posts.append(message)
         save_wall_posts(wall_posts)
-        
+
         flash("Message posted to public wall!", "success")
-    
+
     return redirect(url_for("dashboard"))
 
 @app.route("/remove-from-wall/<int:index>")
 def remove_from_wall(index):
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     wall_posts = load_wall_posts()
-    
+
     if 0 <= index < len(wall_posts):
         wall_posts.pop(index)
         save_wall_posts(wall_posts)
         flash("Post removed from wall!", "success")
-    
+
     return redirect(url_for("admin_wall"))
 
 # Quotes routes
@@ -410,7 +410,7 @@ def quotes():
 def admin_quotes():
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     quotes_data = load_quotes()
     return render_template("admin_quotes.html", quotes=quotes_data)
 
@@ -418,39 +418,39 @@ def admin_quotes():
 def create_quote():
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     text = request.form.get("text")
     author = request.form.get("author")
-    
+
     if text:
         new_quote = {
             "text": text,
             "author": author or "Unknown",
             "timestamp": datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")
         }
-        
+
         quotes_data = load_quotes()
         quotes_data.append(new_quote)
         save_quotes(quotes_data)
-        
+
         flash("Quote added successfully!", "success")
     else:
         flash("Please provide quote text.", "error")
-    
+
     return redirect(url_for("admin_quotes"))
 
 @app.route("/admin/quotes/delete/<int:index>")
 def delete_quote(index):
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     quotes_data = load_quotes()
-    
+
     if 0 <= index < len(quotes_data):
         quotes_data.pop(index)
         save_quotes(quotes_data)
         flash("Quote deleted successfully!", "success")
-    
+
     return redirect(url_for("admin_quotes"))
 
 # Admin Public Wall Management
@@ -458,7 +458,7 @@ def delete_quote(index):
 def admin_public_wall():
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     posts = load_public_posts()
     return render_template("admin_public_wall.html", posts=posts)
 
@@ -466,55 +466,55 @@ def admin_public_wall():
 def create_public_post():
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     content = request.form.get("content")
     image = request.files.get("image")
     attachment = request.files.get("attachment")
-    
+
     if content:
         # Create uploads directory if it doesn't exist
         os.makedirs("uploads", exist_ok=True)
-        
+
         new_post = {
             "content": content,
             "timestamp": datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p"),
             "reactions": {"like": 0, "laugh": 0, "heart": 0},
             "comments": []
         }
-        
+
         # Handle image upload
         if image and image.filename:
             image_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{image.filename}"
             image.save(f"uploads/{image_filename}")
             new_post["image"] = image_filename
-        
+
         # Handle file attachment
         if attachment and attachment.filename:
             attachment_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{attachment.filename}"
             attachment.save(f"uploads/{attachment_filename}")
             new_post["attachment"] = attachment_filename
-        
+
         posts = load_public_posts()
         posts.append(new_post)
         save_public_posts(posts)
-        
+
         flash("Public post created successfully!", "success")
     else:
         flash("Please provide content for the post.", "error")
-    
+
     return redirect(url_for("admin_public_wall"))
 
 @app.route("/admin/public-wall/delete/<int:index>")
 def delete_public_post(index):
     if not session.get("admin"):
         return redirect(url_for("admin"))
-    
+
     posts = load_public_posts()
-    
+
     if 0 <= index < len(posts):
         post = posts.pop(index)
         save_public_posts(posts)
-        
+
         # Clean up uploaded files
         if 'image' in post:
             try:
@@ -526,9 +526,9 @@ def delete_public_post(index):
                 os.remove(f"uploads/{post['attachment']}")
             except:
                 pass
-        
+
         flash("Public post deleted successfully!", "success")
-    
+
     return redirect(url_for("admin_public_wall"))
 
 # Wall interaction routes
@@ -536,62 +536,62 @@ def delete_public_post(index):
 def react_to_post(post_index, reaction_type):
     user_posts = load_wall_posts()
     admin_posts = load_public_posts()
-    
+
     # Combine posts to find the right one
     all_posts = user_posts + admin_posts
-    
+
     if 0 <= post_index < len(all_posts):
         if 'reactions' not in all_posts[post_index]:
             all_posts[post_index]['reactions'] = {'like': 0, 'laugh': 0, 'heart': 0}
-        
+
         if reaction_type in all_posts[post_index]['reactions']:
             all_posts[post_index]['reactions'][reaction_type] += 1
         else:
             all_posts[post_index]['reactions'][reaction_type] = 1
-        
+
         # Save back to appropriate file
         if post_index < len(user_posts):
             save_wall_posts(user_posts)
         else:
             save_public_posts(admin_posts)
-        
+
         return {"success": True, "count": all_posts[post_index]['reactions'][reaction_type]}
-    
+
     return {"success": False}
 
 @app.route("/wall/comment/<int:post_index>", methods=["POST"])
 def comment_on_post(post_index):
     data = request.get_json()
     comment_text = data.get("text", "").strip()
-    
+
     if not comment_text:
         return {"success": False}
-    
+
     user_posts = load_wall_posts()
     admin_posts = load_public_posts()
-    
+
     # Combine posts to find the right one
     all_posts = user_posts + admin_posts
-    
+
     if 0 <= post_index < len(all_posts):
         if 'comments' not in all_posts[post_index]:
             all_posts[post_index]['comments'] = []
-        
+
         new_comment = {
             "text": comment_text,
             "timestamp": datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")
         }
-        
+
         all_posts[post_index]['comments'].append(new_comment)
-        
+
         # Save back to appropriate file
         if post_index < len(user_posts):
             save_wall_posts(user_posts)
         else:
             save_public_posts(admin_posts)
-        
+
         return {"success": True}
-    
+
     return {"success": False}
 
 # Serve uploaded files

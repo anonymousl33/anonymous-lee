@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Reply & Post — Anonymous Lee</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #FAF9F6 0%, #F0F0F0 100%);
+      color: #333;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      color: #06402B;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .message-preview {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border-left: 5px solid #06402B;
+    }
+
+    .reply-form {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #06402B;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #06402B;
+      box-shadow: 0 0 0 3px rgba(6, 64, 43, 0.1);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #06402B 0%, #0a5a3a 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(6, 64, 43, 0.3);
+    }
+
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #333;
+      border: 2px solid #e0e0e0;
+    }
+
+    .btn-secondary:hover {
+      background: #e9ecef;
+    }
+
+    .message-content {
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .message-meta {
+      font-size: 0.9rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Add Reply & Post to Wall</h1>
+    </div>
+
+    <div class="message-preview">
+      <h3 style="margin-bottom: 1rem; color: #06402B;">Original Message:</h3>
+      <div class="message-content">
+        {% if message.artist %}
+          <div><strong>🎵 Music:</strong> {{ message.artist }} - {{ message.song }}</div>
+          <div><strong>Type:</strong> {{ message.type.title() }}
+            {% if message.type == 'dedicated' and message.recipient %} to {{ message.recipient }}{% endif %}
+          </div>
+          {% if message.from %}<div><strong>From:</strong> {{ message.from }}</div>{% endif %}
+          {% if message.message %}<div><strong>Message:</strong> {{ message.message }}</div>{% endif %}
+        {% else %}
+          <div><strong>To:</strong> {{ message.recipient }}</div>
+          <div><strong>Message:</strong> {{ message.message }}</div>
+          <div><strong>From:</strong> {{ message.from or 'Anonymous' }}</div>
+        {% endif %}
+      </div>
+      <div class="message-meta">
+        <strong>Sent At:</strong> {{ message.timestamp }}
+      </div>
+    </div>
+
+    <form method="POST" class="reply-form">
+      <div class="form-group">
+        <label for="admin_reply">Admin Reply (Optional):</label>
+        <textarea name="admin_reply" id="admin_reply" placeholder="Add your reply as admin (this will appear below the original message on the wall)..."></textarea>
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary">Post to Wall</button>
+        <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

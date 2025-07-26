@@ -279,6 +279,13 @@
           {% else %}
             <!-- Regular user message -->
             <div class="post-content">"{{ post.message }}"</div>
+            
+            {% if post.admin_reply %}
+              <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-left: 3px solid #17a2b8; border-radius: 8px;">
+                <div style="font-size: 0.9rem; color: #17a2b8; font-weight: 500; margin-bottom: 0.5rem;">Admin Reply:</div>
+                <div>{{ post.admin_reply }}</div>
+              </div>
+            {% endif %}
           {% endif %}
           
           <div class="post-meta">
@@ -291,7 +298,7 @@
                 — Anonymous
               {% endif %}
             </div>
-            <div>{{ post.timestamp }}</div>
+            <div>{{ post.wall_timestamp or post.timestamp }}</div>
           </div>
 
           <!-- Reactions -->
@@ -299,11 +306,20 @@
             <button class="reaction-btn" onclick="react({{ loop.index0 }}, 'like')">
               👍 <span id="like-{{ loop.index0 }}">{{ post.reactions.like or 0 }}</span>
             </button>
+            <button class="reaction-btn" onclick="react({{ loop.index0 }}, 'heart')">
+              ❤️ <span id="heart-{{ loop.index0 }}">{{ post.reactions.heart or 0 }}</span>
+            </button>
             <button class="reaction-btn" onclick="react({{ loop.index0 }}, 'laugh')">
               😂 <span id="laugh-{{ loop.index0 }}">{{ post.reactions.laugh or 0 }}</span>
             </button>
-            <button class="reaction-btn" onclick="react({{ loop.index0 }}, 'heart')">
-              ❤️ <span id="heart-{{ loop.index0 }}">{{ post.reactions.heart or 0 }}</span>
+            <button class="reaction-btn" onclick="react({{ loop.index0 }}, 'sad')">
+              😢 <span id="sad-{{ loop.index0 }}">{{ post.reactions.sad or 0 }}</span>
+            </button>
+            <button class="reaction-btn" onclick="react({{ loop.index0 }}, 'wow')">
+              😮 <span id="wow-{{ loop.index0 }}">{{ post.reactions.wow or 0 }}</span>
+            </button>
+            <button class="reaction-btn" onclick="react({{ loop.index0 }}, 'angry')">
+              😠 <span id="angry-{{ loop.index0 }}">{{ post.reactions.angry or 0 }}</span>
             </button>
           </div>
 
