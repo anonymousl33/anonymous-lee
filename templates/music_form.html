@@ -2,12 +2,157 @@
 <html>
 <head>
   <title>Send a Music Message — Anonymous Lee</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Poppins'; background-color: #FAF9F6; padding: 2rem; }
-    form { max-width: 500px; margin: auto; display: flex; flex-direction: column; gap: 10px; }
-    input, textarea, select, button { padding: 10px; border: 1px solid #ccc; border-radius: 8px; }
-    button { background-color: #06402B; color: white; border: none; cursor: pointer; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #FAF9F6 0%, #F0F0F0 100%);
+      color: #333;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .header h1 {
+      color: #06402B;
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .header h1::before {
+      content: "🎵";
+      font-size: 2rem;
+    }
+    
+    .header .subtitle {
+      color: #666;
+      font-size: 1.1rem;
+      font-weight: 300;
+    }
+    
+    .form-container {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    input, textarea, select {
+      padding: 15px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #06402B;
+      box-shadow: 0 0 0 3px rgba(6, 64, 43, 0.1);
+    }
+    
+    select {
+      cursor: pointer;
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    .form-group {
+      display: none;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+    
+    .form-group.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    button {
+      background: linear-gradient(135deg, #06402B 0%, #0a5a3a 100%);
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(6, 64, 43, 0.3);
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      color: #06402B;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      margin-top: 2rem;
+    }
+    
+    .back-button:hover {
+      background: #06402B;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(6, 64, 43, 0.2);
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .form-container {
+        padding: 1.5rem;
+      }
+    }
   </style>
   <script>
     function toggleFields() {
@@ -15,42 +160,55 @@
       const fromGroup = document.getElementById('fromGroup');
       const recipientGroup = document.getElementById('recipientGroup');
 
+      // Hide all groups first
+      fromGroup.classList.remove('show');
+      recipientGroup.classList.remove('show');
+
+      // Show relevant groups based on selection
       if (type === 'recommended') {
-        fromGroup.style.display = 'block';
-        recipientGroup.style.display = 'none';
+        setTimeout(() => fromGroup.classList.add('show'), 100);
       } else if (type === 'dedicated') {
-        fromGroup.style.display = 'block';
-        recipientGroup.style.display = 'block';
-      } else {
-        fromGroup.style.display = 'none';
-        recipientGroup.style.display = 'none';
+        setTimeout(() => {
+          fromGroup.classList.add('show');
+          recipientGroup.classList.add('show');
+        }, 100);
       }
     }
   </script>
 </head>
 <body>
-  <h2>Send a Music Message</h2>
-  <form action="/music" method="POST">
-    <input name="artist" placeholder="Artist name" required />
-    <input name="song" placeholder="Song name" required />
-
-    <select name="type" id="type" onchange="toggleFields()" required>
-      <option value="">Select type</option>
-      <option value="recommended">Recommended by</option>
-      <option value="dedicated">Dedicated to</option>
-    </select>
-
-    <div id="recipientGroup" style="display: none;">
-      <input name="recipient" placeholder="Recipient" />
+  <div class="container">
+    <div class="header">
+      <h1>Send a Music Message</h1>
+      <p class="subtitle">Share a song that speaks to your soul</p>
     </div>
+    
+    <div class="form-container">
+      <form action="/music" method="POST">
+        <input name="artist" placeholder="Artist name" required />
+        <input name="song" placeholder="Song name" required />
 
-    <div id="fromGroup" style="display: none;">
-      <input name="from" placeholder="From" />
+        <select name="type" id="type" onchange="toggleFields()" required>
+          <option value="">Select message type</option>
+          <option value="recommended">Recommended by</option>
+          <option value="dedicated">Dedicated to</option>
+        </select>
+
+        <div id="recipientGroup" class="form-group">
+          <input name="recipient" placeholder="Who is this dedicated to?" />
+        </div>
+
+        <div id="fromGroup" class="form-group">
+          <input name="from" placeholder="Your name/signature (optional)" />
+        </div>
+
+        <textarea name="message" placeholder="Tell us why this song is special..." rows="4"></textarea>
+
+        <button type="submit">Send Music Message</button>
+      </form>
     </div>
-
-    <textarea name="message" placeholder="Optional message" rows="4"></textarea>
-
-    <button type="submit">Send Music Message</button>
-  </form>
+    
+    <a href="/" class="back-button">← Back to home</a>
+  </div>
 </body>
 </html>

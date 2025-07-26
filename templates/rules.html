@@ -2,49 +2,174 @@
 <html>
 <head>
   <title>Rules & Reminders — Anonymous Lee</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #FAF9F6;
-      color: #222;
+      background: linear-gradient(135deg, #FAF9F6 0%, #F0F0F0 100%);
+      color: #333;
+      min-height: 100vh;
       padding: 2rem;
-      max-width: 800px;
-      margin: auto;
     }
-    h1 { color: #06402B; }
-    h2 { margin-top: 2rem; }
-    ul { padding-left: 1.5rem; }
-    li { margin-bottom: 10px; }
-    a { color: #06402B; text-decoration: none; display: inline-block; margin-top: 1.5rem; }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      color: #06402B;
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .content-section {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      color: #06402B;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .rules h2::before {
+      content: "⚖️";
+      font-size: 1.5rem;
+    }
+
+    .reminders h2::before {
+      content: "💡";
+      font-size: 1.5rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f8f9fa;
+      margin-bottom: 1rem;
+      padding: 1.2rem;
+      border-radius: 12px;
+      border-left: 4px solid #06402B;
+      line-height: 1.6;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    li:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .rules li {
+      border-left-color: #dc3545;
+    }
+
+    .reminders li {
+      border-left-color: #28a745;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      color: #06402B;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      margin-top: 2rem;
+    }
+
+    .back-button:hover {
+      background: #06402B;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(6, 64, 43, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .content-section {
+        padding: 1.5rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      li {
+        padding: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Rules & Reminders</h1>
+  <div class="container">
+    <div class="header">
+      <h1>Rules & Reminders</h1>
+    </div>
 
-  <h2>Rules</h2>
-  <ul>
-    <li>Messages that are inappropriate, disrespectful, or hateful will not be posted.</li>
-    <li>Anything that invades someone’s privacy or could hurt others won’t be allowed.</li>
-    <li>Messages that feel unnecessary or cross a boundary will be filtered out.</li>
-    <li>This space is meant to be kind, thoughtful, and respectful.</li>
-    <li>Please don’t use it to spread hate, cause drama, or start fights.</li>
-    <li>Let’s all help keep this place safe, comforting, and welcoming for everyone.</li>
-    <li>Please don’t rush the admin. Messages may take time to be posted.</li>
-  </ul>
+    <div class="content-section rules">
+      <h2>Rules</h2>
+      <ul>
+        <li>Messages that are inappropriate, disrespectful, or hateful will not be posted.</li>
+        <li>Anything that invades someone's privacy or could hurt others won't be allowed.</li>
+        <li>Messages that feel unnecessary or cross a boundary will be filtered out.</li>
+        <li>This space is meant to be kind, thoughtful, and respectful.</li>
+        <li>Please don't use it to spread hate, cause drama, or start fights.</li>
+        <li>Let's all help keep this place safe, comforting, and welcoming for everyone.</li>
+        <li>Please don't rush the admin. Messages may take time to be posted.</li>
+      </ul>
+    </div>
 
-  <h2>Reminders</h2>
-  <ul>
-    <li>Express yourself freely — this space is yours.</li>
-    <li>You can send vents, rants, confessions, questions, or just chat.</li>
-    <li>Say what’s on your mind or heart. Be real and honest.</li>
-    <li>Your privacy is safe here.</li>
-    <li>Don’t worry about grammar or language. Just be yourself.</li>
-    <li>No need for masks — you don’t have to pretend here.</li>
-    <li>This is a safe, judgment-free space for you to let things out.</li>
-    <li>Everyone expresses themselves differently — please respect that.</li>
-  </ul>
+    <div class="content-section reminders">
+      <h2>Reminders</h2>
+      <ul>
+        <li>Express yourself freely — this space is yours.</li>
+        <li>You can send vents, rants, confessions, questions, or just chat.</li>
+        <li>Say what's on your mind or heart. Be real and honest.</li>
+        <li>Your privacy is safe here.</li>
+        <li>Don't worry about grammar or language. Just be yourself.</li>
+        <li>No need for masks — you don't have to pretend here.</li>
+        <li>This is a safe, judgment-free space for you to let things out.</li>
+        <li>Everyone expresses themselves differently — please respect that.</li>
+      </ul>
+    </div>
 
-  <a href="/">← Back to message form</a>
+    <a href="/" class="back-button">← Back to message form</a>
+  </div>
 </body>
 </html>
