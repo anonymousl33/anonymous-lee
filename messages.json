@@ -27,7 +27,7 @@
     "recipient": "admin",
     "message": "hihi",
     "from": "",
-    "status": "new",
+    "status": "seen",
     "timestamp": "2025-07-26 01:26 PM"
   },
   {
@@ -51,7 +51,7 @@
     "recipient": "admin",
     "message": "hi admin",
     "from": "",
-    "status": "new",
+    "status": "seen",
     "timestamp": "2025-07-26 02:27 PM"
   }
 ]

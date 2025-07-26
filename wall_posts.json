@@ -1,1 +1,41 @@
-[]
+[
+  {
+    "recipient": "admin",
+    "message": "hi",
+    "from": "",
+    "status": "seen",
+    "timestamp": "2025-07-26 04:36:26",
+    "reactions": {
+      "like": 8,
+      "laugh": 12,
+      "heart": 9
+    },
+    "comments": [
+      {
+        "text": "udbvduvb",
+        "timestamp": "2025-07-26 03:14 PM"
+      },
+      {
+        "text": "omsim",
+        "timestamp": "2025-07-26 03:19 PM"
+      }
+    ]
+  },
+  {
+    "artist": "saja boys",
+    "song": "soda pop",
+    "type": "recommended",
+    "recipient": "",
+    "from": "admin",
+    "message": "",
+    "timestamp": "2025-07-26T05:16:29.193315",
+    "status": "seen"
+  },
+  {
+    "recipient": "admin",
+    "message": "hihi",
+    "from": "",
+    "status": "new",
+    "timestamp": "2025-07-26 01:26 PM"
+  }
+]
