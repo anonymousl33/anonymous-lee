@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard — Anonymous Lee</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins'; background-color: #FAF9F6; padding: 2rem; }
+    .message { padding: 1rem; border-radius: 10px; margin-bottom: 1rem; border: 2px solid white; }
+    .new { border-color: white; }
+    .seen { border-color: green; }
+    .not-posted { border-color: red; }
+    .actions a { margin-right: 10px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>Admin Dashboard</h1>
+  {% for msg in messages %}
+    <div class="message {{ msg.status }}">
+      <strong>To:</strong> {{ msg.recipient }}<br>
+      <strong>Message:</strong> {{ msg.message }}<br>
+      <strong>From:</strong> {{ msg.from or 'Anonymous' }}<br>
+      <strong>Sent At:</strong> {{ msg.timestamp }}<br>
+      <div class="actions">
+        <a href="/label/{{ loop.index0 }}/new">Mark New</a>
+        <a href="/label/{{ loop.index0 }}/seen">Mark Seen</a>
+        <a href="/label/{{ loop.index0 }}/not-posted">Mark Not Posted</a>
+      </div>
+    </div>
+  {% endfor %}
+  <a href="/logout">Logout</a>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Anonymous Lee — Send a Message</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background-color: #FAF9F6; color: #222; }
+    form { margin: 2rem auto; max-width: 500px; display: flex; flex-direction: column; gap: 10px; }
+    input, textarea, button { padding: 10px; border: 1px solid #ccc; border-radius: 8px; }
+    button { background-color: #06402B; color: white; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Send a Message</h1>
+  <form action="/send" method="POST">
+    <input name="recipient" placeholder="Recipient" required>
+    <textarea name="message" placeholder="Your message" rows="5" required></textarea>
+    <input name="from" placeholder="From (optional)">
+    <button type="submit">Send</button>
+  </form>
+  <a href="/rules">Read the Rules & Reminders</a>
+  <a href="/music">Send a Music Message</a>
+  <a href="/login">Admin Login</a>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+[
+  {
+    "recipient": "admin",
+    "message": "hi",
+    "from": "",
+    "status": "new",
+    "timestamp": "2025-07-26 04:36:26"
+  },
+  {
+    "artist": "saja boys",
+    "song": "soda pop",
+    "type": "recommended",
+    "recipient": "",
+    "from": "admin",
+    "message": "",
+    "timestamp": "2025-07-26T05:16:29.193315",
+    "status": "seen"
+  },
+  {
+    "recipient": "admin",
+    "message": "yoyo",
+    "from": "",
+    "status": "seen",
+    "timestamp": "2025-07-26 01:23 PM"
+  },
+  {
+    "recipient": "admin",
+    "message": "hihi",
+    "from": "",
+    "status": "new",
+    "timestamp": "2025-07-26 01:26 PM"
+  },
+  {
+    "recipient": "admin",
+    "message": "yodn",
+    "from": "",
+    "status": "new",
+    "timestamp": "2025-07-26 01:29 PM"
+  }
+]

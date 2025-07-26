@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Send a Music Message — Anonymous Lee</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins'; background-color: #FAF9F6; padding: 2rem; }
+    form { max-width: 500px; margin: auto; display: flex; flex-direction: column; gap: 10px; }
+    input, textarea, select, button { padding: 10px; border: 1px solid #ccc; border-radius: 8px; }
+    button { background-color: #06402B; color: white; border: none; cursor: pointer; }
+  </style>
+  <script>
+    function toggleFields() {
+      const type = document.getElementById('type').value;
+      const fromGroup = document.getElementById('fromGroup');
+      const recipientGroup = document.getElementById('recipientGroup');
+
+      if (type === 'recommended') {
+        fromGroup.style.display = 'block';
+        recipientGroup.style.display = 'none';
+      } else if (type === 'dedicated') {
+        fromGroup.style.display = 'block';
+        recipientGroup.style.display = 'block';
+      } else {
+        fromGroup.style.display = 'none';
+        recipientGroup.style.display = 'none';
+      }
+    }
+  </script>
+</head>
+<body>
+  <h2>Send a Music Message</h2>
+  <form action="/music" method="POST">
+    <input name="artist" placeholder="Artist name" required />
+    <input name="song" placeholder="Song name" required />
+
+    <select name="type" id="type" onchange="toggleFields()" required>
+      <option value="">Select type</option>
+      <option value="recommended">Recommended by</option>
+      <option value="dedicated">Dedicated to</option>
+    </select>
+
+    <div id="recipientGroup" style="display: none;">
+      <input name="recipient" placeholder="Recipient" />
+    </div>
+
+    <div id="fromGroup" style="display: none;">
+      <input name="from" placeholder="From" />
+    </div>
+
+    <textarea name="message" placeholder="Optional message" rows="4"></textarea>
+
+    <button type="submit">Send Music Message</button>
+  </form>
+</body>
+</html>

@@ -1,0 +1,137 @@
+🌐 Website Introduction: Anonymous Lee
+Welcome to Anonymous Lee, a quiet place for your thoughts to rest — where your voice can echo without fear. Share your worries, your stories — no need for masks here. This is a safe space, where feelings wander freely, and only your steps shape the path. Here, every word is safe, and every secret stays on The Freedom Wall.
+
+📄 Website Pages & Features
+1. Homepage (Message Form)
+Users can send anonymous messages using a form with:
+
+Recipient
+
+Message
+
+From
+
+After submitting, messages disappear (the sender won’t see them again)
+
+Messages are timestamped (admin can see when they were sent)
+
+Admin is the only one who can access and view them
+
+2. Rules & Reminders Page
+A static page visible to everyone.
+
+Rules:
+Messages that are inappropriate, disrespectful, or hateful will not be posted.
+
+Anything that invades someone’s privacy or could hurt others won’t be allowed.
+
+Messages that feel unnecessary or cross a boundary will be filtered out.
+
+This space is meant to be kind, thoughtful, and respectful.
+
+Please don’t use it to spread hate, cause drama, or start fights.
+
+Let’s all help keep this place safe, comforting, and welcoming for everyone.
+
+Please don’t rush the admin. Messages may take time to be posted.
+
+Reminders:
+Express yourself freely — this space is yours.
+
+You can send vents, rants, confessions, questions, or just chat.
+
+Say what’s on your mind or heart. Be real and honest.
+
+Your privacy is safe here.
+
+Don’t worry about grammar or language. Just be yourself.
+
+No need for masks — you don’t have to pretend here.
+
+This is a safe, judgment-free space for you to let things out.
+
+Everyone expresses themselves differently — please respect that.
+
+3. Music Message Page
+Form includes:
+
+Artist name
+
+Song name
+
+Message Type (dropdown):
+
+Recommended by → shows: From
+
+Dedicated to → shows: Recipient and From
+
+Optional message box
+
+Sends anonymously like regular messages
+
+4. Anonymous Polls Page
+Admin posts a question/poll with multiple options
+
+Users vote anonymously
+
+After voting, users will see:
+
+Live results
+
+A short message or insight written by the admin (shown after voting)
+
+5. Admin Login
+Only one admin account exists (yours)
+
+No registration, no sign-up page
+
+Login details stored securely in Replit Secrets tab via .env
+
+Credentials:
+
+Email: lee.anonymousl33@gmail.com
+
+Password: 11082008Princess
+(not visible in code; used from .env)
+
+6. Admin Dashboard
+Admin-only page
+
+Displays all user-submitted messages
+
+Sorted from newest to oldest
+
+Shows:
+
+Recipient
+
+Message
+
+From
+
+Date and time sent
+
+Manual labeling system:
+
+🟩 Green outline: Seen
+
+🟥 Red outline: Not posted
+
+⬜️ White outline: New
+
+Admin can change the label by clicking buttons under each message
+
+7. Design & Aesthetics
+Simple, minimalist layout
+
+Light color scheme:
+
+Background: #FAF9F6
+
+Header: Dark green #06402B
+
+Font: Poppins
+
+Responsive layout
+
+Light mode / dark mode toggle (optional future feature)
