@@ -14,16 +14,23 @@
     "from": "rira",
     "message": "kasi andito baby ko HUI",
     "timestamp": "2025-07-26 04:10 PM",
-    "status": "new"
+    "status": "seen"
+  },
+  {
+    "recipient": "admin",
+    "message": "hi",
+    "from": "",
+    "status": "seen",
+    "timestamp": "2025-07-26 05:07 PM"
   },
   {
     "artist": "psychic fever",
-    "song": "whats happenin",
+    "song": "temperature",
     "type": "recommended",
     "recipient": "",
-    "from": "",
-    "message": "",
-    "timestamp": "2025-07-26 04:22 PM",
-    "status": "new"
+    "from": "rira",
+    "message": "i love my baby weesa",
+    "timestamp": "2025-07-26 05:08 PM",
+    "status": "seen"
   }
 ]
