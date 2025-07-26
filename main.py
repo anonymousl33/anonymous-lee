@@ -266,6 +266,7 @@ def create_poll():
             "options": options,
             "admin_insight": admin_insight,
             "votes": {},
+            "comments": [],
             "created_at": datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")
         }
 
@@ -693,6 +694,11 @@ def music():
         recipient = request.form.get("recipient") if msg_type == "dedicated" else ""
         from_user = request.form.get("from")
         optional_msg = request.form.get("message")
+
+        # Server-side validation for message type
+        if not msg_type or msg_type not in ["recommended", "dedicated"]:
+            flash("Please select a valid message type (Recommended by or Dedicated to)", "error")
+            return redirect(url_for("music"))
 
         new_music_msg = {
             "artist": artist,

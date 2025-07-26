@@ -174,6 +174,17 @@
         }, 100);
       }
     }
+
+    function validateForm() {
+      const type = document.getElementById('type').value;
+      
+      if (!type || type === '') {
+        alert('Please select a message type (Recommended by or Dedicated to)');
+        return false;
+      }
+      
+      return true;
+    }
   </script>
 </head>
 <body>
@@ -184,7 +195,7 @@
     </div>
     
     <div class="form-container">
-      <form action="/music" method="POST">
+      <form action="/music" method="POST" onsubmit="return validateForm()">
         <input name="artist" placeholder="Artist name" required />
         <input name="song" placeholder="Song name" required />
 
