@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Polls — Anonymous Lee Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #FAF9F6;
+      color: #222;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 { color: #06402B; }
+    .form-section {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    input, textarea, button {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin: 5px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #06402B;
+      color: white;
+      border: none;
+      cursor: pointer;
+      width: auto;
+      padding: 10px 20px;
+    }
+    .option-input {
+      display: flex;
+      align-items: center;
+      margin: 5px 0;
+    }
+    .option-input input {
+      flex: 1;
+      margin-right: 10px;
+    }
+    .remove-option {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .poll-item {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      border: 2px solid #ddd;
+    }
+    .poll-actions {
+      margin-top: 1rem;
+    }
+    .poll-actions a {
+      margin-right: 10px;
+      padding: 5px 10px;
+      background-color: #06402B;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    .delete-poll {
+      background-color: #dc3545;
+    }
+    a {
+      color: #06402B;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Manage Polls</h1>
+  
+  <div class="form-section">
+    <h2>Create New Poll</h2>
+    <form method="POST" action="/admin/polls/create">
+      <input name="question" placeholder="Poll question" required>
+      
+      <div id="options">
+        <div class="option-input">
+          <input name="options" placeholder="Option 1" required>
+        </div>
+        <div class="option-input">
+          <input name="options" placeholder="Option 2" required>
+        </div>
+      </div>
+      
+      <button type="button" onclick="addOption()">Add Option</button>
+      
+      <textarea name="admin_insight" placeholder="Admin insight (shown after voting)" rows="3"></textarea>
+      
+      <button type="submit">Create Poll</button>
+    </form>
+  </div>
+
+  <h2>Existing Polls</h2>
+  {% if polls %}
+    {% for poll in polls %}
+      <div class="poll-item">
+        <strong>{{ poll.question }}</strong><br>
+        <small>Options: {{ poll.options|join(', ') }}</small><br>
+        <small>Total votes: {{ poll.total_votes }}</small>
+        
+        <div class="poll-actions">
+          <a href="/admin/polls/delete/{{ loop.index0 }}" class="delete-poll" 
+             onclick="return confirm('Are you sure you want to delete this poll?')">Delete</a>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No polls created yet.</p>
+  {% endif %}
+
+  <a href="/dashboard">← Back to Dashboard</a>
+
+  <script>
+    function addOption() {
+      const optionsDiv = document.getElementById('options');
+      const optionCount = optionsDiv.children.length + 1;
+      
+      const div = document.createElement('div');
+      div.className = 'option-input';
+      div.innerHTML = `
+        <input name="options" placeholder="Option ${optionCount}" required>
+        <button type="button" class="remove-option" onclick="removeOption(this)">Remove</button>
+      `;
+      
+      optionsDiv.appendChild(div);
+    }
+    
+    function removeOption(button) {
+      const optionsDiv = document.getElementById('options');
+      if (optionsDiv.children.length > 2) {
+        button.parentElement.remove();
+      }
+    }
+  </script>
+</body>
+</html>

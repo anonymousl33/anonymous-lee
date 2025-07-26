@@ -16,9 +16,19 @@
   <h1>Admin Dashboard</h1>
   {% for msg in messages %}
     <div class="message {{ msg.status }}">
-      <strong>To:</strong> {{ msg.recipient }}<br>
-      <strong>Message:</strong> {{ msg.message }}<br>
-      <strong>From:</strong> {{ msg.from or 'Anonymous' }}<br>
+      {% if msg.artist %}
+        <!-- Music message -->
+        <strong>Music:</strong> {{ msg.artist }} - {{ msg.song }}<br>
+        <strong>Type:</strong> {{ msg.type.title() }}
+        {% if msg.type == 'dedicated' and msg.recipient %} to {{ msg.recipient }}{% endif %}<br>
+        {% if msg.from %}<strong>From:</strong> {{ msg.from }}<br>{% endif %}
+        {% if msg.message %}<strong>Message:</strong> {{ msg.message }}<br>{% endif %}
+      {% else %}
+        <!-- Regular message -->
+        <strong>To:</strong> {{ msg.recipient }}<br>
+        <strong>Message:</strong> {{ msg.message }}<br>
+        <strong>From:</strong> {{ msg.from or 'Anonymous' }}<br>
+      {% endif %}
       <strong>Sent At:</strong> {{ msg.timestamp }}<br>
       <div class="actions">
         <a href="/label/{{ loop.index0 }}/new">Mark New</a>
@@ -27,6 +37,6 @@
       </div>
     </div>
   {% endfor %}
-  <a href="/logout">Logout</a>
+  <a href="/admin/polls">Manage Polls</a> | <a href="/logout">Logout</a>
 </body>
 </html>

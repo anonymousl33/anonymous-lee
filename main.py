@@ -91,12 +91,153 @@ def label(index, status):
 
     return redirect(url_for("dashboard"))
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# Load polls
+def load_polls():
+    if not os.path.exists("polls.json"):
+        return []
+    with open("polls.json", "r") as f:
+        return json.load(f)
+
+# Save polls
+def save_polls(polls):
+    with open("polls.json", "w") as f:
+        json.dump(polls, f, indent=2)
+
+# Load user votes
+def load_user_votes():
+    if not os.path.exists("user_votes.json"):
+        return {}
+    with open("user_votes.json", "r") as f:
+        return json.load(f)
+
+# Save user votes
+def save_user_votes(votes):
+    with open("user_votes.json", "w") as f:
+        json.dump(votes, f, indent=2)
 
 @app.route("/rules")
 def rules():
     return render_template("rules.html")
+
+@app.route("/polls")
+def polls():
+    polls_data = load_polls()
+    user_votes = load_user_votes()
+    user_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+    
+    # Prepare polls with voting status and results
+    polls_with_status = []
+    for i, poll in enumerate(polls_data):
+        poll_copy = poll.copy()
+        
+        # Check if user has voted
+        user_voted = user_ip in poll.get('votes', {})
+        poll_copy['user_voted'] = user_voted
+        
+        # Calculate results
+        votes = poll.get('votes', {})
+        results = {}
+        total_votes = 0
+        
+        for option in poll['options']:
+            results[option] = 0
+        
+        for voter_ip, vote in votes.items():
+            if vote in results:
+                results[vote] += 1
+                total_votes += 1
+        
+        poll_copy['results'] = results
+        poll_copy['total_votes'] = total_votes
+        
+        polls_with_status.append(poll_copy)
+    
+    return render_template("polls.html", polls=polls_with_status)
+
+@app.route("/polls/vote/<int:poll_index>", methods=["POST"])
+def vote_poll(poll_index):
+    polls_data = load_polls()
+    user_votes = load_user_votes()
+    user_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+    
+    if 0 <= poll_index < len(polls_data):
+        vote = request.form.get("vote")
+        
+        # Check if user already voted
+        if 'votes' not in polls_data[poll_index]:
+            polls_data[poll_index]['votes'] = {}
+        
+        if user_ip not in polls_data[poll_index]['votes']:
+            # Record the vote
+            polls_data[poll_index]['votes'][user_ip] = vote
+            save_polls(polls_data)
+            
+            flash("Your vote has been recorded!", "success")
+        else:
+            flash("You have already voted on this poll.", "error")
+    
+    return redirect(url_for("polls"))
+
+@app.route("/admin/polls")
+def admin_polls():
+    if not session.get("admin"):
+        return redirect(url_for("admin"))
+    
+    polls_data = load_polls()
+    
+    # Calculate total votes for each poll
+    for poll in polls_data:
+        poll['total_votes'] = len(poll.get('votes', {}))
+    
+    return render_template("admin_polls.html", polls=polls_data)
+
+@app.route("/admin/polls/create", methods=["POST"])
+def create_poll():
+    if not session.get("admin"):
+        return redirect(url_for("admin"))
+    
+    question = request.form.get("question")
+    options = request.form.getlist("options")
+    admin_insight = request.form.get("admin_insight")
+    
+    # Filter out empty options
+    options = [opt.strip() for opt in options if opt.strip()]
+    
+    if question and len(options) >= 2:
+        new_poll = {
+            "question": question,
+            "options": options,
+            "admin_insight": admin_insight,
+            "votes": {},
+            "created_at": datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")
+        }
+        
+        polls_data = load_polls()
+        polls_data.append(new_poll)
+        save_polls(polls_data)
+        
+        flash("Poll created successfully!", "success")
+    else:
+        flash("Please provide a question and at least 2 options.", "error")
+    
+    return redirect(url_for("admin_polls"))
+
+@app.route("/admin/polls/delete/<int:poll_index>")
+def delete_poll(poll_index):
+    if not session.get("admin"):
+        return redirect(url_for("admin"))
+    
+    polls_data = load_polls()
+    
+    if 0 <= poll_index < len(polls_data):
+        polls_data.pop(poll_index)
+        save_polls(polls_data)
+        flash("Poll deleted successfully!", "success")
+    
+    return redirect(url_for("admin_polls"))
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 @app.route("/music", methods=["GET", "POST"])
 def music():
