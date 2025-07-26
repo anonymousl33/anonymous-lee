@@ -36,5 +36,22 @@
     "from": "",
     "status": "new",
     "timestamp": "2025-07-26 01:29 PM"
+  },
+  {
+    "artist": "saja boys",
+    "song": "jkcjhc",
+    "type": "recommended",
+    "recipient": "",
+    "from": "me",
+    "message": "",
+    "timestamp": "2025-07-26 02:22 PM",
+    "status": "seen"
+  },
+  {
+    "recipient": "admin",
+    "message": "hi admin",
+    "from": "",
+    "status": "new",
+    "timestamp": "2025-07-26 02:27 PM"
   }
 ]
