@@ -33,10 +33,52 @@
       gap: 1rem;
     }
 
+    .header-main {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
     .header h1 {
       color: #06402B;
       font-size: 2.5rem;
       font-weight: 600;
+    }
+
+    .message-indicator {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+      }
+      50% {
+        box-shadow: 0 4px 25px rgba(220, 53, 69, 0.5);
+        transform: scale(1.02);
+      }
+      100% {
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+      }
+    }
+
+    .message-count {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .message-count::before {
+      content: "🔔";
+      font-size: 1.1rem;
     }
 
     .nav-links {
@@ -202,8 +244,19 @@
         align-items: flex-start;
       }
 
+      .header-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
       .header h1 {
         font-size: 2rem;
+      }
+
+      .message-indicator {
+        font-size: 0.8rem;
+        padding: 6px 12px;
       }
 
       .message {
@@ -219,7 +272,14 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>Admin Dashboard</h1>
+      <div class="header-main">
+        <h1>Admin Dashboard</h1>
+        {% if new_message_count > 0 %}
+          <div class="message-indicator">
+            <span class="message-count">{{ new_message_count }} New Message{% if new_message_count != 1 %}s{% endif %}</span>
+          </div>
+        {% endif %}
+      </div>
       <div class="nav-links">
         <a href="/admin/wall" class="nav-link">📝 Freedom Wall</a>
         <a href="/admin/public-wall" class="nav-link">🌐 Public Wall</a>

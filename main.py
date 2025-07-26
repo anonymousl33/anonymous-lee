@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from dotenv import load_dotenv
 from datetime import datetime
 import pytz
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 import os, json
 
@@ -12,6 +15,63 @@ app.secret_key = os.urandom(24)
 
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+
+# Gmail configuration
+GMAIL_EMAIL = os.getenv("GMAIL_EMAIL")
+GMAIL_PASSWORD = os.getenv("GMAIL_PASSWORD")
+NOTIFICATION_EMAIL = "lee.anonymousl33@gmail.com"
+
+def send_email_notification(message_data, message_type):
+    """Send email notification for new messages"""
+    try:
+        # Create message
+        msg = MIMEMultipart()
+        msg['From'] = GMAIL_EMAIL
+        msg['To'] = NOTIFICATION_EMAIL
+        msg['Subject'] = f"New {message_type} Message - Anonymous Lee"
+        
+        # Email body
+        body = f"""
+New {message_type} message received on Anonymous Lee:
+
+Timestamp: {message_data.get('timestamp', 'N/A')}
+Type: {message_type}
+
+"""
+        
+        if message_type == "Music":
+            body += f"""Artist: {message_data.get('artist', 'N/A')}
+Song: {message_data.get('song', 'N/A')}
+Message Type: {message_data.get('type', 'N/A').title()}
+"""
+            if message_data.get('recipient'):
+                body += f"Recipient: {message_data.get('recipient')}\n"
+            if message_data.get('from'):
+                body += f"From: {message_data.get('from')}\n"
+            if message_data.get('message'):
+                body += f"Optional Message: {message_data.get('message')}\n"
+        else:
+            body += f"""Recipient: {message_data.get('recipient', 'N/A')}
+Message: {message_data.get('message', 'N/A')}
+From: {message_data.get('from', 'Anonymous')}
+"""
+        
+        body += f"\n---\nAnonymous Lee Admin Panel: https://{request.host}/admin"
+        
+        msg.attach(MIMEText(body, 'plain'))
+        
+        # Gmail SMTP
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(GMAIL_EMAIL, GMAIL_PASSWORD)
+        text = msg.as_string()
+        server.sendmail(GMAIL_EMAIL, NOTIFICATION_EMAIL, text)
+        server.quit()
+        
+        print(f"Email notification sent for {message_type} message")
+        
+    except Exception as e:
+        print(f"Failed to send email notification: {str(e)}")
 
 # Load messages
 def load_messages():
@@ -47,6 +107,10 @@ def send():
     messages.append(new_msg)
     save_messages(messages)
 
+    # Send email notification
+    if GMAIL_EMAIL and GMAIL_PASSWORD:
+        send_email_notification(new_msg, "Normal")
+
     flash("Message sent anonymously!", "success")
     return redirect(url_for("home"))
 
@@ -72,7 +136,11 @@ def dashboard():
 
     messages = load_messages()
     messages.reverse()  # Show newest first
-    return render_template("dashboard.html", messages=messages)
+    
+    # Count new messages
+    new_message_count = sum(1 for msg in messages if msg.get('status') == 'new')
+    
+    return render_template("dashboard.html", messages=messages, new_message_count=new_message_count)
 
 @app.route("/logout")
 def logout():
@@ -716,6 +784,10 @@ def music():
         messages = load_messages()
         messages.append(new_music_msg)
         save_messages(messages)
+
+        # Send email notification
+        if GMAIL_EMAIL and GMAIL_PASSWORD:
+            send_email_notification(new_music_msg, "Music")
 
         flash("Music message sent!", "success")
         return redirect(url_for("music"))
