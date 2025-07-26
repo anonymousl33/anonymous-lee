@@ -65,6 +65,10 @@
       transform: translateY(-3px);
     }
 
+    .admin-post {
+      border-left-color: #17a2b8;
+    }
+
     .post-content {
       font-size: 1.1rem;
       line-height: 1.7;
@@ -79,11 +83,83 @@
       color: #666;
       border-top: 1px solid #f0f0f0;
       padding-top: 1rem;
+      margin-bottom: 1rem;
     }
 
     .post-from {
       font-weight: 500;
       color: #06402B;
+    }
+
+    .reactions {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .reaction-btn {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+
+    .reaction-btn:hover {
+      background: #e9ecef;
+      transform: scale(1.05);
+    }
+
+    .reaction-btn.active {
+      background: #06402B;
+      color: white;
+      border-color: #06402B;
+    }
+
+    .comments-section {
+      border-top: 1px solid #f0f0f0;
+      padding-top: 1rem;
+    }
+
+    .comment {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .comment-text {
+      margin-bottom: 0.5rem;
+    }
+
+    .comment-meta {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .comment-form {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .comment-input {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .comment-btn {
+      background: #06402B;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
     }
 
     .music-post {
@@ -104,14 +180,16 @@
       margin-bottom: 0.5rem;
     }
 
-    .no-posts {
-      text-align: center;
-      color: #666;
-      font-style: italic;
-      padding: 3rem;
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    .file-attachments {
+      margin: 1rem 0;
+    }
+
+    .file-attachment {
+      background: #f8f9fa;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      margin: 0.5rem 0;
+      border: 1px solid #e9ecef;
     }
 
     .back-button {
@@ -133,7 +211,6 @@
       background: #06402B;
       color: white;
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(6, 64, 43, 0.2);
     }
 
     @media (max-width: 768px) {
@@ -154,6 +231,10 @@
         align-items: flex-start;
         gap: 0.5rem;
       }
+
+      .reactions {
+        flex-wrap: wrap;
+      }
     }
   </style>
 </head>
@@ -161,14 +242,32 @@
   <div class="container">
     <div class="header">
       <h1>The Freedom Wall</h1>
-      <p class="subtitle">Featured messages from the community</p>
+      <p class="subtitle">Community posts and featured messages</p>
     </div>
 
-    {% if posts %}
-      {% for post in posts %}
-        <div class="post {% if post.artist %}music-post{% endif %}">
-          {% if post.artist %}
-            <!-- Music post -->
+    {% if all_posts %}
+      {% for post in all_posts %}
+        <div class="post {% if post.type == 'admin' %}admin-post{% endif %} {% if post.artist %}music-post{% endif %}">
+          {% if post.type == 'admin' %}
+            <!-- Admin public post -->
+            <div class="post-content">{{ post.content }}</div>
+            
+            {% if post.image %}
+              <div class="file-attachments">
+                <img src="/uploads/{{ post.image }}" style="max-width: 100%; border-radius: 10px;">
+              </div>
+            {% endif %}
+            
+            {% if post.attachment %}
+              <div class="file-attachments">
+                <div class="file-attachment">
+                  📎 <a href="/uploads/{{ post.attachment }}" target="_blank">{{ post.attachment }}</a>
+                </div>
+              </div>
+            {% endif %}
+            
+          {% elif post.artist %}
+            <!-- Music message -->
             <div class="music-info">
               <div class="music-title">🎵 {{ post.artist }} - {{ post.song }}</div>
               <div>{{ post.type.title() }}{% if post.type == 'dedicated' and post.recipient %} to {{ post.recipient }}{% endif %}</div>
@@ -176,14 +275,17 @@
             {% if post.message %}
               <div class="post-content">{{ post.message }}</div>
             {% endif %}
+            
           {% else %}
-            <!-- Regular post -->
+            <!-- Regular user message -->
             <div class="post-content">"{{ post.message }}"</div>
           {% endif %}
           
           <div class="post-meta">
             <div class="post-from">
-              {% if post.from %}
+              {% if post.type == 'admin' %}
+                — Admin
+              {% elif post.from %}
                 — {{ post.from }}
               {% else %}
                 — Anonymous
@@ -191,16 +293,84 @@
             </div>
             <div>{{ post.timestamp }}</div>
           </div>
+
+          <!-- Reactions -->
+          <div class="reactions">
+            <button class="reaction-btn" onclick="react({{ loop.index0 }}, 'like')">
+              👍 <span id="like-{{ loop.index0 }}">{{ post.reactions.like or 0 }}</span>
+            </button>
+            <button class="reaction-btn" onclick="react({{ loop.index0 }}, 'laugh')">
+              😂 <span id="laugh-{{ loop.index0 }}">{{ post.reactions.laugh or 0 }}</span>
+            </button>
+            <button class="reaction-btn" onclick="react({{ loop.index0 }}, 'heart')">
+              ❤️ <span id="heart-{{ loop.index0 }}">{{ post.reactions.heart or 0 }}</span>
+            </button>
+          </div>
+
+          <!-- Comments Section -->
+          <div class="comments-section">
+            <div id="comments-{{ loop.index0 }}">
+              {% for comment in post.comments %}
+                <div class="comment">
+                  <div class="comment-text">{{ comment.text }}</div>
+                  <div class="comment-meta">Anonymous • {{ comment.timestamp }}</div>
+                </div>
+              {% endfor %}
+            </div>
+            
+            <form class="comment-form" onsubmit="addComment({{ loop.index0 }}, event)">
+              <input type="text" class="comment-input" placeholder="Add anonymous comment..." required>
+              <button type="submit" class="comment-btn">💬</button>
+            </form>
+          </div>
         </div>
       {% endfor %}
     {% else %}
-      <div class="no-posts">
-        <h3>No posts yet</h3>
-        <p>Check back soon for featured messages from the community</p>
+      <div class="post">
+        <div class="post-content">
+          <h3 style="text-align: center; color: #666;">No posts yet</h3>
+          <p style="text-align: center; color: #666;">Check back soon for community posts and featured messages</p>
+        </div>
       </div>
     {% endif %}
 
     <a href="/" class="back-button">← Back to home</a>
   </div>
+
+  <script>
+    function react(postIndex, reactionType) {
+      fetch(`/wall/react/${postIndex}/${reactionType}`, {
+        method: 'POST'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById(`${reactionType}-${postIndex}`).textContent = data.count;
+        }
+      });
+    }
+
+    function addComment(postIndex, event) {
+      event.preventDefault();
+      const input = event.target.querySelector('.comment-input');
+      const text = input.value.trim();
+      
+      if (!text) return;
+
+      fetch(`/wall/comment/${postIndex}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: text })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        }
+      });
+    }
+  </script>
 </body>
 </html>

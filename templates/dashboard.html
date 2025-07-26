@@ -154,6 +154,15 @@
       background: #138496;
     }
 
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-delete:hover {
+      background: #c82333;
+    }
+
     .music-message {
       background: linear-gradient(45deg, #f8f9fa 0%, #e9ecef 100%);
       border-left: 5px solid #6f42c1;
@@ -203,7 +212,8 @@
     <div class="header">
       <h1>Admin Dashboard</h1>
       <div class="nav-links">
-        <a href="/admin/wall" class="nav-link">📝 Public Wall</a>
+        <a href="/admin/wall" class="nav-link">📝 Freedom Wall</a>
+        <a href="/admin/public-wall" class="nav-link">🌐 Public Wall</a>
         <a href="/admin/quotes" class="nav-link">💭 Quotes</a>
         <a href="/admin/polls" class="nav-link">📊 Polls</a>
         <a href="/logout" class="nav-link">🚪 Logout</a>
@@ -239,6 +249,8 @@
             <a href="/label/{{ loop.index0 }}/seen" class="action-btn btn-seen">👁️ Seen</a>
             <a href="/label/{{ loop.index0 }}/not-posted" class="action-btn btn-not-posted">❌ Not Posted</a>
             <a href="/post-to-wall/{{ loop.index0 }}" class="action-btn btn-post">✈️ Post to Wall</a>
+            <a href="/delete-message/{{ loop.index0 }}" class="action-btn btn-delete" 
+               onclick="return confirm('Are you sure you want to delete this message?')">🗑️ Delete</a>
           </div>
         </div>
       {% endfor %}

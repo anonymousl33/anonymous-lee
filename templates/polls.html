@@ -17,9 +17,9 @@
     .poll-container {
       background: white;
       padding: 1.5rem;
-      border-radius: 10px;
+      border-radius: 15px;
       margin-bottom: 2rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     }
     .poll-question {
       font-size: 1.2em;
@@ -75,6 +75,44 @@
       margin-top: 1rem;
       border-radius: 0 8px 8px 0;
     }
+    .comments-section {
+      margin-top: 2rem;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 1rem;
+    }
+    .comment {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+    .comment-text {
+      margin-bottom: 0.5rem;
+    }
+    .comment-meta {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .comment-form {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .comment-input {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .comment-btn {
+      background: #06402B;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
     a {
       color: #06402B;
       text-decoration: none;
@@ -115,6 +153,24 @@
                 {{ poll.admin_insight }}
               </div>
             {% endif %}
+
+            <!-- Comments Section -->
+            <div class="comments-section">
+              <h4>Comments</h4>
+              <div id="comments-{{ loop.index0 }}">
+                {% for comment in poll.comments %}
+                  <div class="comment">
+                    <div class="comment-text">{{ comment.text }}</div>
+                    <div class="comment-meta">Anonymous • {{ comment.timestamp }}</div>
+                  </div>
+                {% endfor %}
+              </div>
+              
+              <form class="comment-form" onsubmit="addPollComment({{ loop.index0 }}, event)">
+                <input type="text" class="comment-input" placeholder="Add your thoughts..." required>
+                <button type="submit" class="comment-btn">💬</button>
+              </form>
+            </div>
           </div>
         {% else %}
           <!-- Show voting form -->
@@ -138,5 +194,29 @@
   {% endif %}
 
   <a href="/">← Back to home</a>
+
+  <script>
+    function addPollComment(pollIndex, event) {
+      event.preventDefault();
+      const input = event.target.querySelector('.comment-input');
+      const text = input.value.trim();
+      
+      if (!text) return;
+
+      fetch(`/polls/comment/${pollIndex}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: text })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        }
+      });
+    }
+  </script>
 </body>
 </html>
