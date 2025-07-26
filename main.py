@@ -348,9 +348,9 @@ def public_wall():
             post_copy['comments'] = []
         all_posts.append(post_copy)
 
-    # Sort by timestamp (newest first)
+    # Sort by wall timestamp (newest first) - when admin posted it publicly
     try:
-        all_posts.sort(key=lambda x: datetime.strptime(x['timestamp'], "%Y-%m-%d %I:%M %p"), reverse=True)
+        all_posts.sort(key=lambda x: datetime.strptime(x.get('wall_timestamp', x.get('timestamp', '')), "%Y-%m-%d %I:%M %p"), reverse=True)
     except:
         pass  # If timestamp parsing fails, keep original order
 
@@ -364,27 +364,47 @@ def admin_wall():
     posts = load_wall_posts()
     return render_template("admin_wall.html", posts=posts)
 
-@app.route("/post-to-wall/<int:index>")
+@app.route("/post-to-wall/<int:index>", methods=["GET", "POST"])
 def post_to_wall(index):
     if not session.get("admin"):
         return redirect(url_for("admin"))
 
     messages = load_messages()
-    wall_posts = load_wall_posts()
+    # Convert reversed index back to actual index
+    actual_index = len(messages) - 1 - index
+    
+    if not (0 <= actual_index < len(messages)):
+        flash("Message not found", "error")
+        return redirect(url_for("dashboard"))
 
-    if 0 <= index < len(messages):
-        message = messages[index].copy()
-        # Mark as posted
-        messages[index]['status'] = 'seen'
+    if request.method == "GET":
+        # Show reply form
+        message = messages[actual_index]
+        return render_template("admin_reply_form.html", message=message, index=index)
+    
+    if request.method == "POST":
+        # Process reply and post to wall
+        admin_reply = request.form.get("admin_reply", "").strip()
+        
+        message = messages[actual_index].copy()
+        # Add admin reply if provided
+        if admin_reply:
+            message['admin_reply'] = admin_reply
+        
+        # Add wall timestamp
+        message['wall_timestamp'] = datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")
+        
+        # Mark original message as posted
+        messages[actual_index]['status'] = 'seen'
         save_messages(messages)
 
         # Add to wall posts
+        wall_posts = load_wall_posts()
         wall_posts.append(message)
         save_wall_posts(wall_posts)
 
-        flash("Message posted to public wall!", "success")
-
-    return redirect(url_for("dashboard"))
+        flash("Message posted to Freedom Wall!", "success")
+        return redirect(url_for("dashboard"))
 
 @app.route("/remove-from-wall/<int:index>")
 def remove_from_wall(index):
@@ -459,8 +479,36 @@ def admin_public_wall():
     if not session.get("admin"):
         return redirect(url_for("admin"))
 
-    posts = load_public_posts()
-    return render_template("admin_public_wall.html", posts=posts)
+    # Get both admin posts and user messages posted to wall
+    admin_posts = load_public_posts()
+    user_posts = load_wall_posts()
+    
+    # Combine all posts for admin view
+    all_posts = []
+    
+    # Add admin posts with type indicator
+    for i, post in enumerate(admin_posts):
+        post_copy = post.copy()
+        post_copy['type'] = 'admin'
+        post_copy['source_index'] = i
+        post_copy['source'] = 'admin'
+        all_posts.append(post_copy)
+    
+    # Add user posts with type indicator
+    for i, post in enumerate(user_posts):
+        post_copy = post.copy()
+        post_copy['type'] = 'user'
+        post_copy['source_index'] = i
+        post_copy['source'] = 'user'
+        all_posts.append(post_copy)
+    
+    # Sort by wall timestamp (newest first)
+    try:
+        all_posts.sort(key=lambda x: datetime.strptime(x.get('wall_timestamp', x.get('timestamp', '')), "%Y-%m-%d %I:%M %p"), reverse=True)
+    except:
+        pass  # If timestamp parsing fails, keep original order
+    
+    return render_template("admin_public_wall.html", posts=all_posts)
 
 @app.route("/admin/public-wall/create", methods=["POST"])
 def create_public_post():
@@ -528,6 +576,40 @@ def delete_public_post(index):
                 pass
 
         flash("Public post deleted successfully!", "success")
+
+    return redirect(url_for("admin_public_wall"))
+
+@app.route("/admin/delete-from-wall/<source>/<int:index>")
+def delete_from_wall(source, index):
+    if not session.get("admin"):
+        return redirect(url_for("admin"))
+
+    if source == 'admin':
+        posts = load_public_posts()
+        if 0 <= index < len(posts):
+            post = posts.pop(index)
+            save_public_posts(posts)
+            
+            # Clean up uploaded files
+            if 'image' in post:
+                try:
+                    os.remove(f"uploads/{post['image']}")
+                except:
+                    pass
+            if 'attachment' in post:
+                try:
+                    os.remove(f"uploads/{post['attachment']}")
+                except:
+                    pass
+            
+            flash("Post deleted from Freedom Wall!", "success")
+    
+    elif source == 'user':
+        posts = load_wall_posts()
+        if 0 <= index < len(posts):
+            posts.pop(index)
+            save_wall_posts(posts)
+            flash("Message deleted from Freedom Wall!", "success")
 
     return redirect(url_for("admin_public_wall"))
 

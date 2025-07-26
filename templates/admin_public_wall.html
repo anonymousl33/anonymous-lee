@@ -35,7 +35,7 @@
 
     .header h1 {
       color: #06402B;
-      font-size: 2.5rem;
+      font-size: 2rem;
       font-weight: 600;
     }
 
@@ -53,7 +53,6 @@
     .back-link:hover {
       background: #06402B;
       color: white;
-      transform: translateY(-2px);
     }
 
     .form-section {
@@ -61,7 +60,7 @@
       padding: 2rem;
       border-radius: 15px;
       margin-bottom: 2rem;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     }
 
     .form-section h2 {
@@ -78,15 +77,9 @@
     textarea, input[type="file"] {
       padding: 15px;
       border: 2px solid #e0e0e0;
-      border-radius: 12px;
+      border-radius: 10px;
       font-family: 'Poppins', sans-serif;
       font-size: 1rem;
-      transition: border-color 0.3s ease;
-    }
-
-    textarea:focus, input:focus {
-      outline: none;
-      border-color: #06402B;
     }
 
     textarea {
@@ -99,36 +92,49 @@
       color: white;
       border: none;
       padding: 15px 25px;
-      border-radius: 12px;
+      border-radius: 10px;
       font-family: 'Poppins', sans-serif;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 500;
       cursor: pointer;
-      transition: transform 0.2s ease;
+      transition: all 0.2s ease;
     }
 
     button:hover {
       transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(6, 64, 43, 0.3);
     }
 
     .post {
       background: white;
-      padding: 1.5rem;
+      padding: 2rem;
       border-radius: 15px;
       margin-bottom: 1.5rem;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
       border-left: 5px solid #06402B;
     }
 
+    .admin-post {
+      border-left-color: #17a2b8;
+    }
+
+    .music-post {
+      border-left-color: #6f42c1;
+      background: linear-gradient(45deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
     .post-content {
-      margin-bottom: 1rem;
+      font-size: 1.1rem;
       line-height: 1.6;
+      margin-bottom: 1rem;
     }
 
     .post-meta {
       font-size: 0.9rem;
       color: #666;
       margin-bottom: 1rem;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 1rem;
     }
 
     .post-actions {
@@ -140,9 +146,14 @@
       padding: 8px 16px;
       border: none;
       border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
       font-size: 0.85rem;
+      font-weight: 500;
       cursor: pointer;
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
       transition: all 0.2s ease;
     }
 
@@ -157,17 +168,62 @@
 
     .file-info {
       background: #f8f9fa;
-      padding: 0.5rem;
-      border-radius: 5px;
-      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      margin: 0.5rem 0;
       font-size: 0.9rem;
+      color: #666;
+    }
+
+    .no-posts {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      padding: 3rem;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .post-type {
+      display: inline-block;
+      padding: 0.2rem 0.8rem;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+
+    .type-admin {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .type-user {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .post {
+        padding: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Public Wall Management</h1>
+      <h1>🌐 Public Wall Management</h1>
       <a href="/dashboard" class="back-link">← Back to Dashboard</a>
     </div>
 
@@ -181,33 +237,73 @@
       </form>
     </div>
 
-    <h2>Existing Public Posts</h2>
+    <h2>All Posts on Freedom Wall</h2>
+    <p style="color: #666; margin-bottom: 2rem;">Manage all posts currently visible on the Freedom Wall (sorted by posting time)</p>
+
     {% if posts %}
       {% for post in posts %}
-        <div class="post">
-          <div class="post-content">{{ post.content }}</div>
+        <div class="post {% if post.type == 'admin' %}admin-post{% endif %} {% if post.artist %}music-post{% endif %}">
+          <div class="post-type {% if post.type == 'admin' %}type-admin{% else %}type-user{% endif %}">
+            {% if post.type == 'admin' %}Admin Post{% else %}User Message{% endif %}
+          </div>
           
-          {% if post.image %}
-            <div class="file-info">📷 Image: {{ post.image }}</div>
-          {% endif %}
-          
-          {% if post.attachment %}
-            <div class="file-info">📎 Attachment: {{ post.attachment }}</div>
-          {% endif %}
+          <div class="post-content">
+            {% if post.type == 'admin' %}
+              <!-- Admin public post -->
+              {{ post.content }}
+              
+              {% if post.image %}
+                <div class="file-info">📷 Image: {{ post.image }}</div>
+              {% endif %}
+              
+              {% if post.attachment %}
+                <div class="file-info">📎 Attachment: {{ post.attachment }}</div>
+              {% endif %}
+              
+            {% elif post.artist %}
+              <!-- Music message -->
+              <div><strong>🎵 Music:</strong> {{ post.artist }} - {{ post.song }}</div>
+              <div><strong>Type:</strong> {{ post.type.title() }}
+                {% if post.type == 'dedicated' and post.recipient %} to {{ post.recipient }}{% endif %}
+              </div>
+              {% if post.from %}<div><strong>From:</strong> {{ post.from }}</div>{% endif %}
+              {% if post.message %}<div><strong>Message:</strong> {{ post.message }}</div>{% endif %}
+              
+            {% else %}
+              <!-- Regular user message -->
+              <div><strong>Message:</strong> "{{ post.message }}"</div>
+              <div><strong>From:</strong> {{ post.from or 'Anonymous' }}</div>
+              {% if post.recipient %}<div><strong>Originally to:</strong> {{ post.recipient }}</div>{% endif %}
+            {% endif %}
+            
+            {% if post.admin_reply %}
+              <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-left: 3px solid #17a2b8; border-radius: 8px;">
+                <div style="font-size: 0.9rem; color: #17a2b8; font-weight: 500; margin-bottom: 0.5rem;">Admin Reply:</div>
+                <div>{{ post.admin_reply }}</div>
+              </div>
+            {% endif %}
+          </div>
           
           <div class="post-meta">
-            <strong>Posted:</strong> {{ post.timestamp }}
+            <strong>Posted to Wall:</strong> {{ post.wall_timestamp or post.timestamp }}
+            {% if post.timestamp != post.get('wall_timestamp') %}
+              <br><strong>Originally sent:</strong> {{ post.timestamp }}
+            {% endif %}
           </div>
           
           <div class="post-actions">
-            <a href="/admin/public-wall/delete/{{ loop.index0 }}" class="action-btn btn-delete" 
-               onclick="return confirm('Delete this public post?')">🗑️ Delete</a>
+            <a href="/admin/delete-from-wall/{{ post.source }}/{{ post.source_index }}" 
+               class="action-btn btn-delete" 
+               onclick="return confirm('Delete this post from the Freedom Wall?')">
+              🗑️ Delete from Wall
+            </a>
           </div>
         </div>
       {% endfor %}
     {% else %}
-      <div class="post">
-        <p>No public posts yet. Create your first post above!</p>
+      <div class="no-posts">
+        <h3>No posts on the Freedom Wall yet</h3>
+        <p>Posts will appear here once you start posting messages or creating public posts</p>
       </div>
     {% endif %}
   </div>
