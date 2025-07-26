@@ -115,6 +115,30 @@ def save_user_votes(votes):
     with open("user_votes.json", "w") as f:
         json.dump(votes, f, indent=2)
 
+# Load wall posts
+def load_wall_posts():
+    if not os.path.exists("wall_posts.json"):
+        return []
+    with open("wall_posts.json", "r") as f:
+        return json.load(f)
+
+# Save wall posts
+def save_wall_posts(posts):
+    with open("wall_posts.json", "w") as f:
+        json.dump(posts, f, indent=2)
+
+# Load quotes
+def load_quotes():
+    if not os.path.exists("quotes.json"):
+        return []
+    with open("quotes.json", "r") as f:
+        return json.load(f)
+
+# Save quotes
+def save_quotes(quotes):
+    with open("quotes.json", "w") as f:
+        json.dump(quotes, f, indent=2)
+
 @app.route("/rules")
 def rules():
     return render_template("rules.html")
@@ -235,6 +259,109 @@ def delete_poll(poll_index):
         flash("Poll deleted successfully!", "success")
     
     return redirect(url_for("admin_polls"))
+
+# Public Wall routes
+@app.route("/wall")
+def public_wall():
+    posts = load_wall_posts()
+    return render_template("public_wall.html", posts=posts)
+
+@app.route("/admin/wall")
+def admin_wall():
+    if not session.get("admin"):
+        return redirect(url_for("admin"))
+    
+    posts = load_wall_posts()
+    return render_template("admin_wall.html", posts=posts)
+
+@app.route("/post-to-wall/<int:index>")
+def post_to_wall(index):
+    if not session.get("admin"):
+        return redirect(url_for("admin"))
+    
+    messages = load_messages()
+    wall_posts = load_wall_posts()
+    
+    if 0 <= index < len(messages):
+        message = messages[index].copy()
+        # Mark as posted
+        messages[index]['status'] = 'seen'
+        save_messages(messages)
+        
+        # Add to wall posts
+        wall_posts.append(message)
+        save_wall_posts(wall_posts)
+        
+        flash("Message posted to public wall!", "success")
+    
+    return redirect(url_for("dashboard"))
+
+@app.route("/remove-from-wall/<int:index>")
+def remove_from_wall(index):
+    if not session.get("admin"):
+        return redirect(url_for("admin"))
+    
+    wall_posts = load_wall_posts()
+    
+    if 0 <= index < len(wall_posts):
+        wall_posts.pop(index)
+        save_wall_posts(wall_posts)
+        flash("Post removed from wall!", "success")
+    
+    return redirect(url_for("admin_wall"))
+
+# Quotes routes
+@app.route("/quotes")
+def quotes():
+    quotes_data = load_quotes()
+    return render_template("quotes.html", quotes=quotes_data)
+
+@app.route("/admin/quotes")
+def admin_quotes():
+    if not session.get("admin"):
+        return redirect(url_for("admin"))
+    
+    quotes_data = load_quotes()
+    return render_template("admin_quotes.html", quotes=quotes_data)
+
+@app.route("/admin/quotes/create", methods=["POST"])
+def create_quote():
+    if not session.get("admin"):
+        return redirect(url_for("admin"))
+    
+    text = request.form.get("text")
+    author = request.form.get("author")
+    
+    if text and author:
+        new_quote = {
+            "text": text,
+            "author": author,
+            "timestamp": datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")
+        }
+        
+        quotes_data = load_quotes()
+        quotes_data.append(new_quote)
+        save_quotes(quotes_data)
+        
+        flash("Quote added successfully!", "success")
+    else:
+        flash("Please provide both quote text and author.", "error")
+    
+    return redirect(url_for("admin_quotes"))
+
+@app.route("/admin/quotes/delete/<int:index>")
+def delete_quote(index):
+    if not session.get("admin"):
+        return redirect(url_for("admin"))
+    
+    quotes_data = load_quotes()
+    
+    if 0 <= index < len(quotes_data):
+        quotes_data.pop(index)
+        save_quotes(quotes_data)
+        flash("Quote deleted successfully!", "success")
+    
+    return redirect(url_for("admin_quotes"))
 
 if __name__ == '__main__':
     app.run(debug=True)

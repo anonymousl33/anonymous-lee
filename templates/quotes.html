@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quotes — Anonymous Lee</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #FAF9F6 0%, #F0F0F0 100%);
+      color: #333;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      color: #06402B;
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .header h1::before {
+      content: "💭";
+      font-size: 2rem;
+    }
+
+    .header .subtitle {
+      color: #666;
+      font-size: 1.1rem;
+      font-weight: 300;
+    }
+
+    .quote {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 20px;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quote::before {
+      content: '"';
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      font-size: 6rem;
+      color: rgba(6, 64, 43, 0.1);
+      font-family: serif;
+      line-height: 1;
+    }
+
+    .quote:hover {
+      transform: translateY(-5px);
+    }
+
+    .quote-text {
+      font-size: 1.3rem;
+      line-height: 1.6;
+      color: #333;
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .quote-author {
+      font-size: 1rem;
+      color: #06402B;
+      font-weight: 500;
+      font-style: italic;
+    }
+
+    .quote-date {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+
+    .no-quotes {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      padding: 3rem;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      color: #06402B;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      margin-top: 2rem;
+    }
+
+    .back-button:hover {
+      background: #06402B;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(6, 64, 43, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .quote {
+        padding: 2rem;
+      }
+
+      .quote-text {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Quotes</h1>
+      <p class="subtitle">Words of wisdom and inspiration</p>
+    </div>
+
+    {% if quotes %}
+      {% for quote in quotes %}
+        <div class="quote">
+          <div class="quote-text">{{ quote.text }}</div>
+          <div class="quote-author">— {{ quote.author }}</div>
+          <div class="quote-date">{{ quote.timestamp }}</div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="no-quotes">
+        <h3>No quotes yet</h3>
+        <p>Check back soon for inspiring words</p>
+      </div>
+    {% endif %}
+
+    <a href="/" class="back-button">← Back to home</a>
+  </div>
+</body>
+</html>
