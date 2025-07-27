@@ -750,8 +750,8 @@ def comment_on_post(post_index):
 def uploaded_file(filename):
     return app.send_static_file(f"uploads/{filename}")
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
 @app.route("/music", methods=["GET", "POST"])
 def music():
