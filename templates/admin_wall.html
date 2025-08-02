@@ -176,7 +176,7 @@
           </div>
           
           <div class="post-actions">
-            <a href="/remove-from-wall/{{ loop.index0 }}" class="action-btn btn-remove" 
+            <a href="{{ url_for('remove_from_wall', post_id=post.id) }}" class="action-btn btn-remove" 
                onclick="return confirm('Remove this post from the public wall?')">🗑️ Remove</a>
           </div>
         </div>

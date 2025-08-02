@@ -8,9 +8,13 @@ from email.mime.multipart import MIMEMultipart
 
 import os, json
 
+from db import init_db, save_message, load_messages, save_wall_post, load_wall_posts, save_public_post, load_public_posts
+from db import delete_wall_post_by_id
+
 load_dotenv()
 
 app = Flask(__name__)
+init_db()
 app.secret_key = os.urandom(24)
 
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
@@ -73,17 +77,6 @@ From: {message_data.get('from', 'Anonymous')}
     except Exception as e:
         print(f"Failed to send email notification: {str(e)}")
 
-# Load messages
-def load_messages():
-    if not os.path.exists("messages.json"):
-        return []
-    with open("messages.json", "r") as f:
-        return json.load(f)
-
-# Save messages
-def save_messages(messages):
-    with open("messages.json", "w") as f:
-        json.dump(messages, f, indent=2)
 
 @app.route("/")
 def home():
@@ -103,9 +96,7 @@ def send():
         "timestamp": datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")
     }
 
-    messages = load_messages()
-    messages.append(new_msg)
-    save_messages(messages)
+    save_message(new_msg)
 
     # Send email notification
     if GMAIL_EMAIL and GMAIL_PASSWORD:
@@ -200,18 +191,6 @@ def save_user_votes(votes):
     with open("user_votes.json", "w") as f:
         json.dump(votes, f, indent=2)
 
-# Load wall posts
-def load_wall_posts():
-    if not os.path.exists("wall_posts.json"):
-        return []
-    with open("wall_posts.json", "r") as f:
-        return json.load(f)
-
-# Save wall posts
-def save_wall_posts(posts):
-    with open("wall_posts.json", "w") as f:
-        json.dump(posts, f, indent=2)
-
 # Load quotes
 def load_quotes():
     if not os.path.exists("quotes.json"):
@@ -223,18 +202,6 @@ def load_quotes():
 def save_quotes(quotes):
     with open("quotes.json", "w") as f:
         json.dump(quotes, f, indent=2)
-
-# Load public posts
-def load_public_posts():
-    if not os.path.exists("public_posts.json"):
-        return []
-    with open("public_posts.json", "r") as f:
-        return json.load(f)
-
-# Save public posts
-def save_public_posts(posts):
-    with open("public_posts.json", "w") as f:
-        json.dump(posts, f, indent=2)
 
 @app.route("/rules")
 def rules():
@@ -468,25 +435,18 @@ def post_to_wall(index):
         save_messages(messages)
 
         # Add to wall posts
-        wall_posts = load_wall_posts()
-        wall_posts.append(message)
-        save_wall_posts(wall_posts)
+        save_wall_post(message)
 
         flash("Message posted to Freedom Wall!", "success")
         return redirect(url_for("dashboard"))
 
-@app.route("/remove-from-wall/<int:index>")
-def remove_from_wall(index):
+@app.route("/remove-from-wall/<int:post_id>")
+def remove_from_wall(post_id):
     if not session.get("admin"):
         return redirect(url_for("admin"))
 
-    wall_posts = load_wall_posts()
-
-    if 0 <= index < len(wall_posts):
-        wall_posts.pop(index)
-        save_wall_posts(wall_posts)
-        flash("Post removed from wall!", "success")
-
+    delete_wall_post_by_id(post_id)
+    flash("Post removed from wall!", "success")
     return redirect(url_for("admin_wall"))
 
 # Quotes routes
@@ -611,9 +571,7 @@ def create_public_post():
             attachment.save(f"uploads/{attachment_filename}")
             new_post["attachment"] = attachment_filename
 
-        posts = load_public_posts()
-        posts.append(new_post)
-        save_public_posts(posts)
+        save_public_post(new_post)
 
         flash("Public post created successfully!", "success")
     else:
