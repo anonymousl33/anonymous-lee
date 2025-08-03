@@ -747,8 +747,5 @@ def music():
 
     return render_template("music_form.html")
 
-from db import update_message_table_for_music
-update_message_table_for_music()
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
