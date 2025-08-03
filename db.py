@@ -121,6 +121,31 @@ def load_wall_posts():
         })
     return posts
 
+def save_wall_posts(all_posts):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    # Delete all existing wall posts first
+    cursor.execute("DELETE FROM wall_posts")
+
+    # Re-insert all posts
+    for post in all_posts:
+        cursor.execute('''
+            INSERT INTO wall_posts (recipient, message, sender, status, timestamp, admin_reply, wall_timestamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            post.get("recipient"),
+            post.get("message"),
+            post.get("from", "Anonymous"),
+            post.get("status", "seen"),
+            post.get("timestamp"),
+            post.get("admin_reply"),
+            post.get("wall_timestamp")
+        ))
+
+    conn.commit()
+    conn.close()
+
 def save_public_post(post_data):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
