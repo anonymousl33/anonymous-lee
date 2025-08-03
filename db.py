@@ -49,14 +49,17 @@ def save_message(message_data):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO messages (recipient, message, sender, status, timestamp)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO messages (recipient, message, sender, status, timestamp, type, artist, song)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         message_data.get("recipient"),
         message_data.get("message"),
         message_data.get("from", "Anonymous"),
         message_data.get("status", "new"),
-        message_data.get("timestamp", datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p"))
+        message_data.get("timestamp", datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")),
+        message_data.get("type"),
+        message_data.get("artist"),
+        message_data.get("song")
     ))
     conn.commit()
     conn.close()
@@ -64,7 +67,7 @@ def save_message(message_data):
 def load_messages():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    cursor.execute('SELECT recipient, message, sender, status, timestamp FROM messages')
+    cursor.execute('SELECT recipient, message, sender, status, timestamp, type, artist, song FROM messages')
     rows = cursor.fetchall()
     conn.close()
 
@@ -75,7 +78,10 @@ def load_messages():
             "message": row[1],
             "from": row[2],
             "status": row[3],
-            "timestamp": row[4]
+            "timestamp": row[4],
+            "type": row[5],
+            "artist": row[6],
+            "song": row[7]
         })
     return messages
 
@@ -231,3 +237,33 @@ def mark_message_as_seen(index):
     if 0 <= actual_index < len(messages):
         messages[actual_index]['status'] = 'seen'
         save_messages(messages)
+
+def update_message_table_for_music():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    try:
+        cursor.execute("ALTER TABLE messages ADD COLUMN artist TEXT")
+    except:
+        pass
+    try:
+        cursor.execute("ALTER TABLE messages ADD COLUMN song TEXT")
+    except:
+        pass
+    try:
+        cursor.execute("ALTER TABLE messages ADD COLUMN type TEXT")
+    except:
+        pass
+    try:
+        cursor.execute("ALTER TABLE messages ADD COLUMN recipient TEXT")
+    except:
+        pass
+    try:
+        cursor.execute("ALTER TABLE messages ADD COLUMN from_user TEXT")
+    except:
+        pass
+    try:
+        cursor.execute("ALTER TABLE messages ADD COLUMN optional_msg TEXT")
+    except:
+        pass
+    conn.commit()
+    conn.close()
