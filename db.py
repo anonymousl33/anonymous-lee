@@ -199,3 +199,10 @@ def delete_message_by_index(index):
     if 0 <= actual_index < len(messages):
         messages.pop(actual_index)
         save_messages(messages)
+
+def mark_message_as_seen(index):
+    messages = load_messages()
+    actual_index = len(messages) - 1 - index
+    if 0 <= actual_index < len(messages):
+        messages[actual_index]['status'] = 'seen'
+        save_messages(messages)
