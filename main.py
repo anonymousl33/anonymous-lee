@@ -432,7 +432,7 @@ def post_to_wall(index):
         message['wall_timestamp'] = datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")
         
         # Mark original message as posted
-                mark_message_as_seen(index)
+        mark_message_as_seen(index)
 
         # Add to wall posts
         save_wall_post(message)
