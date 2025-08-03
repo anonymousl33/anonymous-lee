@@ -185,3 +185,10 @@ def delete_wall_post_by_id(post_id):
     cursor.execute("DELETE FROM wall_posts WHERE id = ?", (post_id,))
     conn.commit()
     conn.close()
+
+def update_message_status_by_index(index, new_status):
+    messages = load_messages()
+    actual_index = len(messages) - 1 - index
+    if 0 <= actual_index < len(messages):
+        messages[actual_index]['status'] = new_status
+        save_messages(messages)
