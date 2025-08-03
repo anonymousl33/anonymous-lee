@@ -8,8 +8,19 @@ from email.mime.multipart import MIMEMultipart
 
 import os, json
 
-from db import init_db, save_message, load_messages, save_wall_post, load_wall_posts, save_public_post, load_public_posts
-from db import delete_wall_post_by_id
+from db import (
+    init_db,
+    save_message,
+    load_messages,
+    save_wall_post,
+    load_wall_posts,
+    save_public_post,
+    load_public_posts,
+    delete_wall_post_by_id,
+    update_message_status_by_index,
+    delete_message_by_index,
+    mark_message_as_seen
+)
 
 load_dotenv()
 
@@ -143,12 +154,7 @@ def label(index, status):
     if not session.get("admin"):
         return redirect(url_for("admin"))
 
-    messages = load_messages()
-    # Convert reversed index back to actual index
-    actual_index = len(messages) - 1 - index
-    if 0 <= actual_index < len(messages):
-        messages[actual_index]['status'] = status
-        save_messages(messages)
+    update_message_status_by_index(index, status)
 
     return redirect(url_for("dashboard"))
 
@@ -157,13 +163,8 @@ def delete_message(index):
     if not session.get("admin"):
         return redirect(url_for("admin"))
 
-    messages = load_messages()
-    # Convert reversed index back to actual index
-    actual_index = len(messages) - 1 - index
-    if 0 <= actual_index < len(messages):
-        messages.pop(actual_index)
-        save_messages(messages)
-        flash("Message deleted successfully!", "success")
+    delete_message_by_index(index)
+    flash("Message deleted successfully!", "success")
 
     return redirect(url_for("dashboard"))
 
@@ -431,8 +432,7 @@ def post_to_wall(index):
         message['wall_timestamp'] = datetime.now(pytz.timezone("Asia/Manila")).strftime("%Y-%m-%d %I:%M %p")
         
         # Mark original message as posted
-        messages[actual_index]['status'] = 'seen'
-        save_messages(messages)
+                mark_message_as_seen(index)
 
         # Add to wall posts
         save_wall_post(message)
@@ -736,9 +736,7 @@ def music():
 
 
         # Load and save like the regular message
-        messages = load_messages()
-        messages.append(new_music_msg)
-        save_messages(messages)
+                save_message(new_music_msg)
 
         # Send email notification
         if GMAIL_EMAIL and GMAIL_PASSWORD:
