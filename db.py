@@ -192,3 +192,10 @@ def update_message_status_by_index(index, new_status):
     if 0 <= actual_index < len(messages):
         messages[actual_index]['status'] = new_status
         save_messages(messages)
+
+def delete_message_by_index(index):
+    messages = load_messages()
+    actual_index = len(messages) - 1 - index
+    if 0 <= actual_index < len(messages):
+        messages.pop(actual_index)
+        save_messages(messages)
