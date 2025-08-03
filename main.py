@@ -736,7 +736,7 @@ def music():
 
 
         # Load and save like the regular message
-                save_message(new_music_msg)
+        save_message(new_music_msg)
 
         # Send email notification
         if GMAIL_EMAIL and GMAIL_PASSWORD:
