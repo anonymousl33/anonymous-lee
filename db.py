@@ -7,7 +7,8 @@ DB_NAME = "messages.db"
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    
+
+    # Ensure base table exists first (without new cols)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,6 +20,23 @@ def init_db():
         )
     ''')
 
+    # Add new columns if missing
+    try:
+        cursor.execute("ALTER TABLE messages ADD COLUMN type TEXT")
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE messages ADD COLUMN artist TEXT")
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE messages ADD COLUMN song TEXT")
+    except sqlite3.OperationalError:
+        pass
+
+    # Wall posts
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS wall_posts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,6 +50,7 @@ def init_db():
         )
     ''')
 
+    # Public posts
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS public_posts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -187,6 +206,28 @@ def load_public_posts():
         })
     return posts
 
+def save_public_posts(all_posts):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    # Delete all existing public posts first
+    cursor.execute("DELETE FROM public_posts")
+
+    # Re-insert all posts
+    for post in all_posts:
+        cursor.execute('''
+            INSERT INTO public_posts (content, timestamp, image, attachment)
+            VALUES (?, ?, ?, ?)
+        ''', (
+            post.get("content"),
+            post.get("timestamp"),
+            post.get("image"),
+            post.get("attachment")
+        ))
+
+    conn.commit()
+    conn.close()
+
 def save_messages(all_messages):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -197,15 +238,18 @@ def save_messages(all_messages):
     # Re-insert all messages
     for msg in all_messages:
         cursor.execute('''
-            INSERT INTO messages (recipient, message, sender, status, timestamp)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (
-            msg.get("recipient"),
-            msg.get("message"),
-            msg.get("from", "Anonymous"),
-            msg.get("status", "new"),
-            msg.get("timestamp")
-        ))
+            INSERT INTO messages (recipient, message, sender, status, timestamp, type, artist, song)
+	    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	''', (
+	    msg.get("recipient"),
+    	    msg.get("message"),
+    	    msg.get("from", "Anonymous"),
+    	    msg.get("status", "new"),
+    	    msg.get("timestamp"),   # <--- still saving date/time here
+    	    msg.get("type"),
+    	    msg.get("artist"),
+    	    msg.get("song")
+	))
 
     conn.commit()
     conn.close()
@@ -242,27 +286,15 @@ def update_message_table_for_music():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     try:
+        cursor.execute("ALTER TABLE messages ADD COLUMN type TEXT")
+    except:
+        pass
+    try:
         cursor.execute("ALTER TABLE messages ADD COLUMN artist TEXT")
     except:
         pass
     try:
         cursor.execute("ALTER TABLE messages ADD COLUMN song TEXT")
-    except:
-        pass
-    try:
-        cursor.execute("ALTER TABLE messages ADD COLUMN type TEXT")
-    except:
-        pass
-    try:
-        cursor.execute("ALTER TABLE messages ADD COLUMN recipient TEXT")
-    except:
-        pass
-    try:
-        cursor.execute("ALTER TABLE messages ADD COLUMN from_user TEXT")
-    except:
-        pass
-    try:
-        cursor.execute("ALTER TABLE messages ADD COLUMN optional_msg TEXT")
     except:
         pass
     conn.commit()
