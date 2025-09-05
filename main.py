@@ -10,8 +10,18 @@ from flask import send_from_directory
 import os, json
 
 from db import (
-    save_message, load_messages, save_wall_post, save_wall_posts, load_wall_posts, delete_wall_post_by_id,
-    save_public_post, save_public_posts, load_public_posts, delete_message_by_index, update_message_status_by_index,
+    init_db,
+    save_message,
+    load_messages,
+    save_wall_post,
+    load_wall_posts,
+    save_public_post,
+    load_public_posts,
+    save_public_posts,
+    save_messages,
+    delete_wall_post_by_id,
+    update_message_status_by_index,
+    delete_message_by_index,
     mark_message_as_seen
 )
 
