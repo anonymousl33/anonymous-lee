@@ -649,7 +649,7 @@ def react_to_post(post_index, reaction_type):
     user_posts = load_wall_posts()
     admin_posts = load_public_posts()
 
-    # Combine posts to find the right one
+    # Combine posts
     all_posts = user_posts + admin_posts
 
     if 0 <= post_index < len(all_posts):
@@ -661,13 +661,16 @@ def react_to_post(post_index, reaction_type):
         else:
             all_posts[post_index]['reactions'][reaction_type] = 1
 
-        # Save back to appropriate file
+        # ✅ Save correctly to DB
         if post_index < len(user_posts):
-            save_wall_posts(user_posts)
+            save_wall_post(all_posts[post_index])   # for Freedom Wall
         else:
-            save_public_posts(admin_posts)
+            save_public_post(all_posts[post_index]) # for Admin Public Wall
 
-        return {"success": True, "count": all_posts[post_index]['reactions'][reaction_type]}
+        return {
+            "success": True,
+            "count": all_posts[post_index]['reactions'][reaction_type]
+        }
 
     return {"success": False}
 
@@ -696,11 +699,11 @@ def comment_on_post(post_index):
 
         all_posts[post_index]['comments'].append(new_comment)
 
-        # Save back to appropriate file
+        # Save back correctly depending on where the post came from
         if post_index < len(user_posts):
-            save_wall_posts(user_posts)
+            save_wall_post(all_posts[post_index])   # ✅ single wall post
         else:
-            save_public_posts(admin_posts)
+            save_public_post(all_posts[post_index]) # ✅ single public post
 
         return {"success": True}
 
