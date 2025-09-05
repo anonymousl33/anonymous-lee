@@ -5,6 +5,7 @@ import pytz
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from flask import send_from_directory
 
 import os, json
 
@@ -706,7 +707,7 @@ def comment_on_post(post_index):
 # Serve uploaded files
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
-    return app.send_static_file(f"uploads/{filename}")
+    return send_from_directory("uploads", filename)
 
 @app.route("/music", methods=["GET", "POST"])
 def music():
